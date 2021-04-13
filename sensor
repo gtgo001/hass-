@@ -1,0 +1,102 @@
+- platform: template
+  sensors:
+    dc1_v:
+      friendly_name: 当前电压
+      value_template: "{{ state_attr('switch.dc1', 'v') }}"
+      unit_of_measurement: V
+    dc1_p:
+      friendly_name: 当前功率
+      value_template: "{{ state_attr('switch.dc1', 'p') }}"
+      unit_of_measurement: W
+    dc1_i:
+      friendly_name: 当前电流
+      value_template: "{{ state_attr('switch.dc1', 'i') }}"
+      unit_of_measurement: A
+
+- platform: command_line
+  name: cpu0
+  command: "ssh root@192.168.168.2 sensors | sed -n '3,3p'"
+  value_template: "{{ value[14:19]|int(0,10) }}"
+  unit_of_measurement: °C
+  scan_interval: 30
+
+- platform: command_line
+  name: core0
+  command: "ssh root@192.168.168.2 sensors| sed -n '4,4p'"
+  value_template: "{{ value[14:19]|int(0,10) }}"
+  unit_of_measurement: °C
+  scan_interval: 30
+
+- platform: command_line
+  name: core1
+  command: "ssh root@192.168.168.2 sensors | sed -n '5,5p'"
+  value_template: "{{ value[14:19]|int(0,10) }}"
+  unit_of_measurement: °C
+  scan_interval: 30
+
+- platform: command_line
+  name: core2
+  command: "ssh root@192.168.168.2 sensors | sed -n '6,6p'"
+  value_template: "{{ value[14:19]|int(0,10) }}"
+  unit_of_measurement: °C
+  scan_interval: 30
+
+- platform: command_line
+  name: core3
+  command: "ssh root@192.168.168.2 sensors | sed -n '7,7p'"
+  value_template: "{{ value[14:19]|int(0,10) }}"
+  unit_of_measurement: °C
+  scan_interval: 30
+
+- platform: rest
+  resource: http://www.bohu-tech.com/phone/api/425231312
+  method: GET
+  name: airmonitor
+  scan_interval: 30
+  value_template: "{{ value_json['pm2.5'] }}"
+  unit_of_measurement: "ug/m3"
+  json_attributes:
+    - "pm2.5"
+    - "aqi"
+    - "temp"
+    - "pm1"
+    - "pm10"
+    - "hcho"
+    - "co2"
+    - "tvoc"
+#    - "time"
+
+- platform: template
+  sensors:
+    pm25:
+      friendly_name: PM2.5
+      value_template: "{{ state_attr('sensor.airmonitor', 'pm2.5') }}"
+      unit_of_measurement: ug/m3
+    pm1:
+      friendly_name: PM1
+      value_template: "{{ state_attr('sensor.airmonitor', 'pm1') }}"
+      unit_of_measurement: ug/m3
+    pm10:
+      friendly_name: PM10
+      value_template: "{{ state_attr('sensor.airmonitor', 'pm10') }}"
+      unit_of_measurement: ug/m3
+    co2:
+      friendly_name: CO2
+      value_template: "{{ state_attr('sensor.airmonitor', 'co2') }}"
+      unit_of_measurement: ppm
+    hcho:
+      friendly_name: HCHO
+      value_template: "{{ state_attr('sensor.airmonitor', 'hcho') }}"
+      unit_of_measurement: ug/m3
+    temp:
+      friendly_name: Temperature
+      value_template: "{{ state_attr('sensor.airmonitor', 'temp') }}"
+      unit_of_measurement: °C
+    tvoc:
+      friendly_name: TVOC
+      value_template: "{{ state_attr('sensor.airmonitor', 'tvoc') }}"
+      unit_of_measurement: ug/m3
+    aqi:
+      friendly_name: AQI
+      value_template: "{{ state_attr('sensor.airmonitor', 'aqi') }}"
+      unit_of_measurement: aqi
